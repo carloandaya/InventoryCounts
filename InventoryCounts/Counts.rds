@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Counts">
+  <ConnectionProperties>
+    <Extension>OLEDB-MD</Extension>
+    <ConnectString>Data Source=mwhqinvtsql1;Initial Catalog=AnalysisMyWireless</ConnectString>
+    <IntegratedSecurity>true</IntegratedSecurity>
+  </ConnectionProperties>
+  <DataSourceID>00323a47-88bc-495a-8f36-260b8b395804</DataSourceID>
+</RptDataSource>
