@@ -9,26 +9,14 @@
   </DataSources>
   <DataSets>
     <ProjectItem>
-      <Name>DataSet1.rsd</Name>
-      <FullPath>DataSet1.rsd</FullPath>
+      <Name>InventoryCounts.rsd</Name>
+      <FullPath>InventoryCounts.rsd</FullPath>
     </ProjectItem>
   </DataSets>
   <Reports>
     <ProjectItem>
-      <Name>Report1.rdl</Name>
-      <FullPath>Report1.rdl</FullPath>
-    </ProjectItem>
-    <ProjectItem>
-      <Name>Report2.rdl</Name>
-      <FullPath>Report2.rdl</FullPath>
-    </ProjectItem>
-    <ProjectItem>
-      <Name>Report3.rdl</Name>
-      <FullPath>Report3.rdl</FullPath>
-    </ProjectItem>
-    <ProjectItem>
-      <Name>Inventory Min Max Guidance.rdl</Name>
-      <FullPath>Inventory Min Max Guidance.rdl</FullPath>
+      <Name>InventoryGuidance.rdl</Name>
+      <FullPath>InventoryGuidance.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>
@@ -64,7 +52,7 @@
       <Options>
         <OutputPath>bin\Release</OutputPath>
         <TargetServerVersion>SSRS2016</TargetServerVersion>
-        <TargetServerURL>http://localhost/reportserver</TargetServerURL>
+        <TargetServerURL>http://mwhqinvtsql1/ReportServer</TargetServerURL>
         <TargetFolder>InventoryCounts</TargetFolder>
         <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
         <TargetDatasetFolder>Datasets</TargetDatasetFolder>

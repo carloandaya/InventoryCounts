@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet2">
+    <Query>
+      <DataSourceReference>Counts</DataSourceReference>
+      <CommandText>
+-- Cumulative 
+with 
+member [Measures].[CumulativeReceive] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[ReceiveQty])'
+member [Measures].[CumulativeSales] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[Sellout Qty])'
+member [Measures].[CumulativeTransferIn] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[TransferInQty])'
+member [Measures].[CumulativeTransferOut] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[TransferOutQty])'
+member [Measures].[SellthroughRate] as
+[Measures].[CumulativeSales] / [Measures].[CumulativeReceive], FORMAT = '0.0000'
+member [Measures].[EstimatedStock] as
+[Measures].[CumulativeReceive] + [Measures].[CumulativeTransferIn] - [Measures].[CumulativeSales] - [Measures].[CumulativeTransferOut]
+member [Measures].[StockLevel] as
+[Measures].[ReceiveQty] + [Measures].[TransferInQty] - [Measures].[Sellout Qty] - [Measures].[TransferOutQty] + [Measures].[Refund Qty]
+member [Location_SKU] as
+generate([Locations].[Store Name].[Store Name].Members
+		, {[Device].[Device Name].[Device Name]}
+		, ALL)
+member [Measures].[ZeroDays] as 
+count(filter(strtomember('[Time].[Date].&amp;[' + format(now(), 'yyyy-MM-dd') + 'T00:00:00]').Lag(14) : 
+strtomember('[Time].[Date].&amp;[' + format(now(), 'yyyy-MM-dd') + 'T00:00:00]'), [Measures].[EstimatedStock] &lt;= 0))
+select
+{[Measures].[ZeroDays]
+, [Measures].[ReceiveQty]
+, [Measures].[TransferInQty]
+, [Measures].[Refund Qty]
+, [Measures].[Sellout Qty]
+, [Measures].[TransferOutQty]
+, [Measures].[StockLevel]
+}
+on columns
+, order([Locations].[Store Name].[Store Name] * [Device].[Device Name].[Device Name], [Measures].[ZeroDays], DESC)
+on rows
+from (select 
+{[Time].[Year].&amp;[2017-01-01T00:00:00]} on columns
+from
+[My Wireless Datamart])
+where({
+[Device].[Model].&amp;[IPHONE8]
+, [Device].[Model].&amp;[IPHONE8P]
+, [Device].[Model].&amp;[IPHONEX]
+, [Device].[Model].&amp;[GS8]
+, [Device].[Model].&amp;[GS8P]
+, [Device].[Model].&amp;[GS8ACTIVE]
+, [Device].[Model].&amp;[NOTE8]
+}
+)
+</CommandText>
+      <rd:DesignerState>
+        <QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+          <CommandType>MDX</CommandType>
+          <Type>Query</Type>
+          <QuerySpecification xsi:type="MDXQuerySpecification">
+            <Select>
+              <Items>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Locations</DimensionName>
+                    <HierarchyName>Store Name</HierarchyName>
+                    <HierarchyUniqueName>[Locations].[Store Name]</HierarchyUniqueName>
+                    <LevelName>Store Name</LevelName>
+                    <UniqueName>[Locations].[Store Name].[Store Name]</UniqueName>
+                  </ID>
+                  <ItemCaption>Store Name</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Device</DimensionName>
+                    <HierarchyName>Device Name</HierarchyName>
+                    <HierarchyUniqueName>[Device].[Device Name]</HierarchyUniqueName>
+                    <LevelName>Device Name</LevelName>
+                    <UniqueName>[Device].[Device Name].[Device Name]</UniqueName>
+                  </ID>
+                  <ItemCaption>Device Name</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>ZeroDays</MeasureName>
+                    <UniqueName>[Measures].[ZeroDays]</UniqueName>
+                  </ID>
+                  <ItemCaption>ZeroDays</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>ReceiveQty</MeasureName>
+                    <UniqueName>[Measures].[ReceiveQty]</UniqueName>
+                  </ID>
+                  <ItemCaption>ReceiveQty</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>TransferInQty</MeasureName>
+                    <UniqueName>[Measures].[TransferInQty]</UniqueName>
+                  </ID>
+                  <ItemCaption>TransferInQty</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>Refund Qty</MeasureName>
+                    <UniqueName>[Measures].[Refund Qty]</UniqueName>
+                  </ID>
+                  <ItemCaption>Refund Qty</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>Sellout Qty</MeasureName>
+                    <UniqueName>[Measures].[Sellout Qty]</UniqueName>
+                  </ID>
+                  <ItemCaption>Sellout Qty</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>TransferOutQty</MeasureName>
+                    <UniqueName>[Measures].[TransferOutQty]</UniqueName>
+                  </ID>
+                  <ItemCaption>TransferOutQty</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+                <Item>
+                  <ID xsi:type="Measure">
+                    <MeasureName>StockLevel</MeasureName>
+                    <UniqueName>[Measures].[StockLevel]</UniqueName>
+                  </ID>
+                  <ItemCaption>StockLevel</ItemCaption>
+                  <FormattedValue>true</FormattedValue>
+                </Item>
+              </Items>
+            </Select>
+            <From>My Wireless Datamart</From>
+            <Filter>
+              <FilterItems />
+            </Filter>
+            <Calculations />
+            <Aggregates />
+            <QueryProperties />
+          </QuerySpecification>
+          <Query>
+            <Statement>
+-- Cumulative 
+with 
+member [Measures].[CumulativeReceive] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[ReceiveQty])'
+member [Measures].[CumulativeSales] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[Sellout Qty])'
+member [Measures].[CumulativeTransferIn] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[TransferInQty])'
+member [Measures].[CumulativeTransferOut] as
+'SUM({[Time].[Date].&amp;[2017-01-01T00:00:00]:[Time].[Date].CurrentMember}, [Measures].[TransferOutQty])'
+member [Measures].[SellthroughRate] as
+[Measures].[CumulativeSales] / [Measures].[CumulativeReceive], FORMAT = '0.0000'
+member [Measures].[EstimatedStock] as
+[Measures].[CumulativeReceive] + [Measures].[CumulativeTransferIn] - [Measures].[CumulativeSales] - [Measures].[CumulativeTransferOut]
+member [Measures].[StockLevel] as
+[Measures].[ReceiveQty] + [Measures].[TransferInQty] - [Measures].[Sellout Qty] - [Measures].[TransferOutQty] + [Measures].[Refund Qty]
+member [Location_SKU] as
+generate([Locations].[Store Name].[Store Name].Members
+		, {[Device].[Device Name].[Device Name]}
+		, ALL)
+member [Measures].[ZeroDays] as 
+count(filter(strtomember('[Time].[Date].&amp;[' + format(now(), 'yyyy-MM-dd') + 'T00:00:00]').Lag(14) : 
+strtomember('[Time].[Date].&amp;[' + format(now(), 'yyyy-MM-dd') + 'T00:00:00]'), [Measures].[EstimatedStock] &lt;= 0))
+select
+{[Measures].[ZeroDays]
+, [Measures].[ReceiveQty]
+, [Measures].[TransferInQty]
+, [Measures].[Refund Qty]
+, [Measures].[Sellout Qty]
+, [Measures].[TransferOutQty]
+, [Measures].[StockLevel]
+}
+on columns
+, order([Locations].[Store Name].[Store Name] * [Device].[Device Name].[Device Name], [Measures].[ZeroDays], DESC)
+on rows
+from (select 
+{[Time].[Year].&amp;[2017-01-01T00:00:00]} on columns
+from
+[My Wireless Datamart])
+where({
+[Device].[Model].&amp;[IPHONE8]
+, [Device].[Model].&amp;[IPHONE8P]
+, [Device].[Model].&amp;[IPHONEX]
+, [Device].[Model].&amp;[GS8]
+, [Device].[Model].&amp;[GS8P]
+, [Device].[Model].&amp;[GS8ACTIVE]
+, [Device].[Model].&amp;[NOTE8]
+}
+)
+
+</Statement>
+            <ParameterDefinitions />
+          </Query>
+        </QueryDefinition>
+      </rd:DesignerState>
+    </Query>
+    <Fields>
+      <Field Name="Store_Name">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Level" UniqueName="[Locations].[Store Name].[Store Name]" /&gt;</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Device_Name">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Level" UniqueName="[Device].[Device Name].[Device Name]" /&gt;</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ZeroDays">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[ZeroDays]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="ReceiveQty">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[ReceiveQty]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TransferInQty">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[TransferInQty]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Refund_Qty">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[Refund Qty]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Sellout_Qty">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[Sellout Qty]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TransferOutQty">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[TransferOutQty]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="StockLevel">
+        <DataField>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="Measure" UniqueName="[Measures].[StockLevel]" /&gt;</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>
